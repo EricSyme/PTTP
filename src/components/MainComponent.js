@@ -9,8 +9,19 @@ import { LEADERS } from '../shared/leaders';
 import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import Home from './HomeComponent';
+import About from './AboutComponent';
 import Contact from './ContactComponent';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux';
+
+const mapStateToProps = state => {
+  return {
+    recordings: state.recordings,
+    comments: state.comments,
+    promotions: state.promotions,
+    leaders: state.leaders
+  }
+}
 
 class Main extends Component {
 
@@ -30,16 +41,16 @@ class Main extends Component {
     const HomePage = () => {
       return(
           <Home 
-              recording={this.state.recordings.filter((recording) => recording.featured)[0]}
-              promotion={this.state.promotions.filter((promo) => promo.featured)[0]}
-              leader={this.state.leaders.filter((leader) => leader.featured)[0]}
+              recording={this.props.recordings.filter((recording) => recording.featured)[0]}
+              promotion={this.props.promotions.filter((promo) => promo.featured)[0]}
+              leader={this.props.leaders.filter((leader) => leader.featured)[0]}
           />
       );
     };
 
     const RecordingWithId = ({match}) => {
       return(
-        <RecordingDetail recording={this.state.recordings.filter((recording) => recording.id === parseInt(match.params.recordingId,10))[0]} comments={this.state.comments.filter((comment) => comment.recordingId === parseInt(match.params.recordingId,10))} /> 
+        <RecordingDetail recording={this.props.recordings.filter((recording) => recording.id === parseInt(match.params.recordingId,10))[0]} comments={this.props.comments.filter((comment) => comment.recordingId === parseInt(match.params.recordingId,10))} /> 
       );
     };
 
@@ -48,7 +59,8 @@ class Main extends Component {
         <Header />
           <Switch>
             <Route path='/home' component={HomePage} />
-            <Route exact path='/recordingsmenu' render={() => <Menu recordings={this.state.recordings} /> } />
+            <Route exact path='/aboutus' render={() => <About leaders={this.props.leaders} />} />
+            <Route exact path='/recordingsmenu' render={() => <Menu recordings={this.props.recordings} /> } />
             <Route path='/menu/:recordingId' component={RecordingWithId} />
             <Route exact path='/contactus' component={Contact} />
             <Redirect to="/home" />
@@ -59,4 +71,4 @@ class Main extends Component {
   }
 }
 
-export default Main;
+export default withRouter(connect(mapStateToProps)(Main));
